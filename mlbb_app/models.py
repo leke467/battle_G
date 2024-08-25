@@ -4,6 +4,11 @@ from django.contrib.contenttypes.models import ContentType
 from squad_app.models import GameSquad, GameSquadApplicationBase, GameSquadInviteBase
 
 class mlbb_profile(models.Model):
+    """
+
+    The `mlbb_profile` class represents a model in the `mlbb_app` app that stores information about Mobile Legends: Bang Bang player profiles.
+
+    """
     mlbb_player_id = models.CharField(primary_key=True, max_length=50)
     mlbb_player_ign = models.CharField(max_length=100)
     country = models.CharField(max_length=100)

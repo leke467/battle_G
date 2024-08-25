@@ -16,9 +16,6 @@ class mlbb_squadSerializer(serializers.ModelSerializer):
         model = mlbb_squad
         fields = '__all__'
 
-    def perform_create(self, serializer):
-        serializer.save(leader=self.request.user.profile)
-
 
 
 class mlbb_Squad_ApplicationSerializer(serializers.ModelSerializer):

@@ -6,6 +6,7 @@ from mlbb_app import models
 from mlbb_app import serializers
 from mlbb_app.serializers import mlbb_profileSerializer
 from mlbb_app.models import mlbb_profile
+from django.shortcuts import get_object_or_404
 
 
 class Mlbb_Account_serializer_create(generics.ListCreateAPIView):
@@ -19,7 +20,7 @@ class mlbb_squad_create(squad_views.SquadCreateBase):
 
     def perform_create(self, serializer):
         user_profile = self.request.user.profile
-        serializer.save(leader=user_profile, leader_id=user_profile.mlbb_id)
+        serializer.save(leader=user_profile, leader_id=user_profile.mlbb_player_id)
 
 
 
@@ -35,41 +36,35 @@ class mlbbSquadView(APIView):
         return Response(serializer.data)
 
 
-class SendSquadInviteView(APIView):
-    def post(self, request, squad_id, player_id):
-        squad = models.mlbb_squad.objects.get(id=squad_id)
-        player = models.mlbb_profile.objects.get(id=player_id)
-        invite = models.mlbb_Squad_Invite(squad=squad, player=player)
-        invite.save()
-        serializer = serializers.GameSquadInviteSerializer(invite)
-        return Response(serializer.data)
+# Import generics at the beginning
+from rest_framework import generics
 
 
-class UpdateSquadInviteView(APIView):
-    def patch(self, request, invite_id):
-        invite = models.mlbb_Squad_Invite.objects.get(id=invite_id)
-        serializer = serializers.GameSquadInviteSerializer(invite, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+class SendSquadInviteView(generics.CreateAPIView):
+    queryset = models.mlbb_Squad_Invite.objects.all()
+    serializer_class = serializers.GameSquadInviteSerializer
 
 
-class ApplyToSquadView(APIView):
-    def post(self, request, squad_id):
-        squad = models.mlbb_squad.objects.get(id=squad_id)
+class UpdateSquadInviteView(generics.UpdateAPIView):
+    queryset = models.mlbb_Squad_Invite.objects.all()
+    serializer_class = serializers.GameSquadInviteSerializer
+
+
+class ApplyToSquadView(generics.CreateAPIView):
+    queryset = models.mlbb_Squad_Application.objects.all()
+    serializer_class = serializers.mlbb_Squad_ApplicationSerializer
+
+    def create(self, request, *args, **kwargs):
+        squad = get_object_or_404(models.mlbb_squad, id=kwargs.get("squad_id"))
         player = request.user.mlbb_profile
         application = models.mlbb_Squad_Application(squad=squad, player=player)
         application.save()
-        serializer = serializers.mlbb_Squad_ApplicationSerializer(application)
+        serializer = self.get_serializer(application)
         return Response(serializer.data)
 
-class UpdateSquadApplicationView(APIView):
-    def patch(self, request, application_id):
-        application = models.mlbb_Squad_Application.objects.get(id=application_id)
-        serializer = serializers.mlbb_Squad_ApplicationSerializer(application, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+
+class UpdateSquadApplicationView(generics.UpdateAPIView):
+    queryset = models.mlbb_Squad_Application.objects.all()
+    serializer_class = serializers.mlbb_Squad_ApplicationSerializer
+
 

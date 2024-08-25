@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'mlbb_app',
     'squad_app',
     'rest_framework',
+    'rest_framework.authtoken'
 
 
 ]
@@ -91,7 +92,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'HOST': 'LEKE',  # Update host to match instance name
         'PORT': '1433',
-        'NAME': 'Grid_database',
+        'NAME': 'Battlegrid_database',
         'USER': 'sa',  # Update user format
         'PASSWORD': 'mujeeb467',
         'OPTIONS': {
@@ -102,21 +103,6 @@ DATABASES = {
 
 
 
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'mssql',
-#         'HOST': 'LEKE',
-#         'PORT': '1433',
-#         'NAME': 'Grid_database',
-#         'USER': 'LEKE/adele',
-#         'PASSWORD': 'mujeeb467',
-#         'OPTIONS': {
-#             'driver': 'ODBC Driver 18 for SQL Server',
-#         },
-#     },
-# }
 
 
 

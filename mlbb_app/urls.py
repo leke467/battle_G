@@ -5,7 +5,7 @@ from mlbb_app import  views
 
 urlpatterns = [
 
-    path('mlbb/', views.Mlbb_Account_serializer_create.as_view(), name='mobile legends'),
+    path('mlbb/account/', views.Mlbb_Account_serializer_create.as_view(), name='mobile legends'),
     path('mlbb/createsquad/', views.mlbb_squad_create.as_view(), name='create mlbb squad'),
     path('mlbb/updatesquad/<int:pk>', views.mlbbSquadRetrieveUpdateDestroy.as_view(), name='update mlbb squad'),
     path('mlbb/squads/', views.mlbbSquadView.as_view(), name='all mlbb squad'),

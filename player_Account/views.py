@@ -1,10 +1,12 @@
+from rest_framework.views import APIView
 
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from django.db import IntegrityError, transaction
 from player_Account.models import Account
 from player_Account.serializers import AccountSerializer
 from player_Account.backends import Account_Auth_Backend
+
 
 class AccountListCreate(generics.ListCreateAPIView):
     authentication_classes = [Account_Auth_Backend]
@@ -13,9 +15,30 @@ class AccountListCreate(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         email = request.data.get('email')
-        if Account.objects.filter(email=email).exists():
-            return Response({'error': 'Email address already in use'}, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
+        if email is not None:
+            email = email.strip().lower()
+        else:
+            return Response({'error': 'Email field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # Check if the email already exists in a non-atomic block
+            if Account.objects.filter(email=email).exists():
+                return Response({'error': 'Email address already in use'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Proceed with creation inside an atomic block
+            with transaction.atomic():
+                return super().create(request, *args, **kwargs)
+
+        except IntegrityError as e:
+            error_message = str(e)
+            print(f"IntegrityError: {error_message}")  # Log the full error message for debugging
+
+            if 'UNIQUE constraint' in error_message or 'duplicate key' in error_message:
+                return Response({'error': 'Duplicate entry detected. The email already exists.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error': f'An error occurred: {error_message}'},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class AccountRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [Account_Auth_Backend]
@@ -25,21 +48,33 @@ class AccountRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         pk = kwargs['pk']
-        account = Account.objects.get(pk=pk)
-        account.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            account = Account.objects.get(pk=pk)
+            account.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Account.DoesNotExist:
+            return Response({"error": "Account not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        email = self.normalize_email(request.data.get('email'))
         password = request.data.get('password')
-        print(email, password)
+        logger.debug(f"Login attempt: {email}, {password}")
         user = Account_Auth_Backend().authenticate(request, email, password)
-        print(user)
-        if user:
+        logger.debug(f"Authenticated user: {user}")
+
+        if user is not None:
             serializer = AccountSerializer(user)
             data = serializer.data
             return Response({'message': 'Login successful', 'user': data}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def normalize_email(self, email):
+        return email.strip().lower()
