@@ -6,6 +6,9 @@ from django.db import IntegrityError, transaction
 from player_Account.models import Account
 from player_Account.serializers import AccountSerializer
 from player_Account.backends import Account_Auth_Backend
+import logging
+from django.contrib.auth.hashers import make_password, check_password
+from rest_framework.authtoken.models import Token
 
 
 class AccountListCreate(generics.ListCreateAPIView):
@@ -56,25 +59,46 @@ class AccountRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
             return Response({"error": "Account not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-import logging
-
 logger = logging.getLogger(__name__)
 
 
+
 class LoginView(APIView):
+    account_auth_backend = Account_Auth_Backend()  # Only one instance
+
     def post(self, request):
         email = self.normalize_email(request.data.get('email'))
         password = request.data.get('password')
-        logger.debug(f"Login attempt: {email}, {password}")
-        user = Account_Auth_Backend().authenticate(request, email, password)
-        logger.debug(f"Authenticated user: {user}")
 
-        if user is not None:
-            serializer = AccountSerializer(user)
+        # Hash the provided password
+        hashed_password = make_password(password)
+
+        # Don't log sensitive information such as email and hashed passwords
+        logger.debug("Login attempt made")
+
+        # Use check_password to compare provided password with stored hashed password
+        account = self.account_auth_backend.authenticate(request, email, hashed_password)
+
+        logger.debug(f"Authenticated user: {account}")
+        if account is not None:
+            token, _ = Token.objects.get_or_create(user=account)
+
+            # Ensure that the token is unique
+            if token.user != account:
+                token.delete()
+                token = Token.objects.create(user=account)
+
+            serializer = AccountSerializer(account)
             data = serializer.data
-            return Response({'message': 'Login successful', 'user': data}, status=status.HTTP_200_OK)
+            return Response({'message': 'Login successful', 'user': data, 'token': token.key},
+                            status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
     def normalize_email(self, email):
-        return email.strip().lower()
+        normalized_email = email.strip().lower()
+        local, _, domain = normalized_email.partition('@')
+        local = local.replace('.', '')
+        return '{}@{}'.format(local, domain)
+
+
