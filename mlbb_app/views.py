@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from squad_app import views as squad_views
-from rest_framework import generics
+from rest_framework import generics, status
 from mlbb_app import models
 from mlbb_app import serializers
 from mlbb_app.serializers import mlbb_profileSerializer
@@ -13,15 +13,26 @@ class Mlbb_Account_serializer_create(generics.ListCreateAPIView):
     queryset = mlbb_profile.objects.all()
     serializer_class = mlbb_profileSerializer
 
+
+class mlbb_Account_update(generics.RetrieveUpdateDestroyAPIView):
+    queryset = mlbb_profile.objects.all()
+    serializer_class = serializers.mlbb_profileSerializer
+    lookup_field = 'mlbb_player_id'
+
+
+
+
 class mlbb_squad_create(squad_views.SquadCreateBase):
     queryset = models.mlbb_squad.objects.all()
     serializer_class = serializers.mlbb_squadSerializer
     squad_id_field = "squad_id"
 
     def perform_create(self, serializer):
-        user_profile = self.request.user.profile
-        serializer.save(leader=user_profile, leader_id=user_profile.mlbb_player_id)
-
+        if self.request.user.is_authenticated:
+            user_profile = self.request.user.profile
+            serializer.save(leader=user_profile, leader_id=user_profile.mlbb_player_id)
+        else:
+            return Response("Unauthorized", status=status.HTTP_403_FORBIDDEN)
 
 
 
@@ -30,6 +41,7 @@ class mlbbSquadRetrieveUpdateDestroy(squad_views.SquadRetrieveUpdateDestroyBase)
     serializer_class = serializers.mlbb_squadSerializer
 
 class mlbbSquadView(APIView):
+    queryset = models.mlbb_squad.objects.all()
     def get(self, request):
         squads = models.mlbb_squad.objects.all()
         serializer = serializers.mlbb_squadSerializer(squads, many=True)

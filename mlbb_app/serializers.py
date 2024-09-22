@@ -9,7 +9,7 @@ from mlbb_app.models import mlbb_Squad_Invite
 class mlbb_profileSerializer(serializers.ModelSerializer):
     class Meta:
         model = mlbb_profile
-        fields = ['mlbb_player_id', 'mlbb_player_ign', 'country', 'squad_id']
+        fields = ['mlbb_player_id', 'mlbb_player_ign', 'country', 'squad_id', 'Account_id']
 
 class mlbb_squadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,9 +21,10 @@ class mlbb_squadSerializer(serializers.ModelSerializer):
 class mlbb_Squad_ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = mlbb_Squad_Application
-        fields = ['id', 'squad', 'player', 'status']
+        # fields = ['id', 'squad', 'status']
+        fields = '__all__'
 
 class GameSquadInviteSerializer(serializers.ModelSerializer):
     class Meta:
         model = mlbb_Squad_Invite
-        fields = ['id', 'squad', 'player', 'status']
+        fields = ['id', 'squad', 'user', 'status']

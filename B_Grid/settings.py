@@ -92,7 +92,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'HOST': 'LEKE',  # Update host to match instance name
         'PORT': '1433',
-        'NAME': 'new_battle_data_base',
+        'NAME': 'new_data',
         'USER': 'sa',  # Update user format
         'PASSWORD': 'mujeeb467',
         'OPTIONS': {
