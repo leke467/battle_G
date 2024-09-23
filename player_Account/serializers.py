@@ -12,10 +12,17 @@ class AccountSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def validate_email(self, value):
-        if Account.objects.filter(email=value).exists():
-            raise serializers.ValidationError("An account with this email already exists.")
+        try:
+            user = Account.objects.get(email=value)
+            if self.instance:
+                if user.pk != self.instance.pk:
+                    raise serializers.ValidationError("An account with this email already exists.")
+            else:
+                if Account.objects.filter(email=value).exists():
+                    raise serializers.ValidationError("An account with this email already exists.")
+        except Account.DoesNotExist:
+            pass
         return value
-
     def create(self, validated_data):
         try:
             validated_data['password'] = make_password(validated_data['password'])

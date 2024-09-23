@@ -1,5 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from squad_app import views as squad_views
 from rest_framework import generics, status
 from mlbb_app import models
@@ -20,8 +20,6 @@ class mlbb_Account_update(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'mlbb_player_id'
 
 
-
-
 class mlbb_squad_create(squad_views.SquadCreateBase):
     queryset = models.mlbb_squad.objects.all()
     serializer_class = serializers.mlbb_squadSerializer
@@ -40,16 +38,14 @@ class mlbbSquadRetrieveUpdateDestroy(squad_views.SquadRetrieveUpdateDestroyBase)
     queryset = models.mlbb_squad.objects.all()
     serializer_class = serializers.mlbb_squadSerializer
 
-class mlbbSquadView(APIView):
-    queryset = models.mlbb_squad.objects.all()
-    def get(self, request):
-        squads = models.mlbb_squad.objects.all()
-        serializer = serializers.mlbb_squadSerializer(squads, many=True)
-        return Response(serializer.data)
+class mlbbSquadView(generics.ListAPIView):
+    serializer_class = serializers.mlbb_squadSerializer
 
-
-# Import generics at the beginning
-from rest_framework import generics
+    def get_queryset(self):
+        try:
+            return models.mlbb_squad.objects.all()
+        except ObjectDoesNotExist:
+            return Response({"error": "mlbb_squad not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SendSquadInviteView(generics.CreateAPIView):

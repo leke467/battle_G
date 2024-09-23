@@ -53,10 +53,13 @@ class AccountRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         pk = kwargs['pk']
         try:
             account = Account.objects.get(pk=pk)
-            account.delete()
+            account.is_active = False  # Updating status instead of deleting
+            account.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Account.DoesNotExist:
             return Response({"error": "Account not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:  # Catch-all exception handler
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 logger = logging.getLogger(__name__)
