@@ -21,10 +21,11 @@ class mlbb_squadSerializer(serializers.ModelSerializer):
 class mlbb_Squad_ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = mlbb_Squad_Application
-        # fields = ['id', 'squad', 'status']
+        # fields = ['squad_id', 'squad', 'status']
         fields = '__all__'
 
 class GameSquadInviteSerializer(serializers.ModelSerializer):
     class Meta:
         model = mlbb_Squad_Invite
-        fields = ['id', 'squad', 'user', 'status']
+        # fields = ['squad_id', 'squad', 'user', 'status']
+        fields = "__all__"

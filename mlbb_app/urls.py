@@ -11,9 +11,9 @@ urlpatterns = [
     path('mlbb/updatesquad/<int:pk>', views.mlbbSquadRetrieveUpdateDestroy.as_view(), name='update mlbb squad'),
     path('mlbb/squads/', views.mlbbSquadView.as_view(), name='all mlbb squad'),
     path('mlbb/squads/<int:squad_id>/invites/', views.SendSquadInviteView.as_view()),
-    path('mlbb/squads/<int:squad_id>/invites/<int:invite_id>/', views.UpdateSquadInviteView.as_view()),
+    path('mlbb/squads/<int:squad_id>/invites/<int:pk>/', views.UpdateSquadInviteView.as_view()),
     path('mlbb/squads/<int:squad_id>/apply/', views.ApplyToSquadView.as_view()),
-    path('mlbb/squads/<int:squad_id>/applications/<int:application_id>/', views.UpdateSquadApplicationView.as_view()),
+    path('mlbb/squads/<int:squad_id>/applications/<int:pk>/', views.UpdateSquadApplicationView.as_view()),
 
 ]
 

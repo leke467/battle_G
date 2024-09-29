@@ -44,7 +44,7 @@ class mlbbSquadView(generics.ListAPIView):
             return Response({"error": "mlbb_squad not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class SendSquadInviteView(generics.CreateAPIView):
+class SendSquadInviteView(generics.ListAPIView):
     queryset = models.mlbb_Squad_Invite.objects.all()
     serializer_class = serializers.GameSquadInviteSerializer
 
@@ -52,20 +52,11 @@ class SendSquadInviteView(generics.CreateAPIView):
 class UpdateSquadInviteView(generics.UpdateAPIView):
     queryset = models.mlbb_Squad_Invite.objects.all()
     serializer_class = serializers.GameSquadInviteSerializer
-    lookup_field = 'invite_id'
 
 
-class ApplyToSquadView(generics.CreateAPIView):
+class ApplyToSquadView(generics.ListCreateAPIView):
     queryset = models.mlbb_Squad_Application.objects.all()
     serializer_class = serializers.mlbb_Squad_ApplicationSerializer
-
-    def create(self, request, *args, **kwargs):
-        squad = get_object_or_404(models.mlbb_squad, id=kwargs.get("squad_id"))
-        player = request.user.mlbb_profile
-        application = models.mlbb_Squad_Application(squad=squad, player=player)
-        application.save()
-        serializer = self.get_serializer(application)
-        return Response(serializer.data)
 
 
 class UpdateSquadApplicationView(generics.UpdateAPIView):
