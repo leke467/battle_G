@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'player_Account',
     'mlbb_app',
-    'squad_app',
     'rest_framework',
     'rest_framework.authtoken'
 

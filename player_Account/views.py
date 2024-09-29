@@ -27,6 +27,7 @@ class AccountListCreate(generics.ListCreateAPIView):
             if Account.objects.filter(email=email).exists():
                 return Response({'error': 'Email address already in use'}, status=status.HTTP_400_BAD_REQUEST)
 
+
             # Proceed with creation inside an atomic block
             with transaction.atomic():
                 return super().create(request, *args, **kwargs)

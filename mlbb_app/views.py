@@ -1,43 +1,39 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from squad_app import views as squad_views
 from rest_framework import generics, status
 from mlbb_app import models
 from mlbb_app import serializers
 from mlbb_app.serializers import mlbb_profileSerializer
-from mlbb_app.models import mlbb_profile
+
 from django.shortcuts import get_object_or_404
 
 
 class Mlbb_Account_serializer_create(generics.ListCreateAPIView):
-    queryset = mlbb_profile.objects.all()
+    queryset = models.mlbb_profile.objects.all()
     serializer_class = mlbb_profileSerializer
 
 
+
 class mlbb_Account_update(generics.RetrieveUpdateDestroyAPIView):
-    queryset = mlbb_profile.objects.all()
+    queryset = models.mlbb_profile.objects.all()
     serializer_class = serializers.mlbb_profileSerializer
     lookup_field = 'mlbb_player_id'
 
-
-class mlbb_squad_create(squad_views.SquadCreateBase):
+class mlbbSquadCreate(generics.ListCreateAPIView):
     queryset = models.mlbb_squad.objects.all()
     serializer_class = serializers.mlbb_squadSerializer
     squad_id_field = "squad_id"
 
-    def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            user_profile = self.request.user.profile
-            serializer.save(leader=user_profile, leader_id=user_profile.mlbb_player_id)
-        else:
-            return Response("Unauthorized", status=status.HTTP_403_FORBIDDEN)
-
-
-
-class mlbbSquadRetrieveUpdateDestroy(squad_views.SquadRetrieveUpdateDestroyBase):
+class mlbbSquadRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.mlbb_squad.objects.all()
     serializer_class = serializers.mlbb_squadSerializer
+    lookup_field = "pk"
 
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        squad = self.get_object().get(pk=pk)
+        squad.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 class mlbbSquadView(generics.ListAPIView):
     serializer_class = serializers.mlbb_squadSerializer
 
@@ -56,6 +52,7 @@ class SendSquadInviteView(generics.CreateAPIView):
 class UpdateSquadInviteView(generics.UpdateAPIView):
     queryset = models.mlbb_Squad_Invite.objects.all()
     serializer_class = serializers.GameSquadInviteSerializer
+    lookup_field = 'invite_id'
 
 
 class ApplyToSquadView(generics.CreateAPIView):
