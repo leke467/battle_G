@@ -14,6 +14,10 @@ urlpatterns = [
     path('mlbb/squads/<int:squad_id>/invites/<int:pk>/', views.UpdateSquadInviteView.as_view()),
     path('mlbb/squads/<int:squad_id>/apply/', views.ApplyToSquadView.as_view()),
     path('mlbb/squads/<int:squad_id>/applications/<int:pk>/', views.UpdateSquadApplicationView.as_view()),
+    path('mlbb/CreateCommunity/', views.createMlbbCommunityView.as_view(), name='mlbb community'),
+    path('mlbb/CommunityMembership/', views.createMlbbCommunityMembershipView.as_view(), name='mlbb community membership'),
+    path('mlbb/community/<int:community_id>/', views.updateMlbbCommunityView.as_view(), name='update_mlbb community membership'),
+    path('mlbb/community/', views.mlbbCommunityView.as_view(),   name='view all mlbb community membership'),
 
 ]
 

@@ -63,4 +63,26 @@ class UpdateSquadApplicationView(generics.UpdateAPIView):
     queryset = models.mlbb_Squad_Application.objects.all()
     serializer_class = serializers.mlbb_Squad_ApplicationSerializer
 
+class createMlbbCommunityView(generics.ListCreateAPIView):
+    queryset = models.mlbb_community.objects.all()
+    serializer_class = serializers.Mlbb_CommunitySerializer
+
+class updateMlbbCommunityView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.mlbb_community.objects.all()
+    serializer_class = serializers.Mlbb_CommunitySerializer
+    lookup_field = "community_id"
+
+class createMlbbCommunityMembershipView(generics.ListCreateAPIView):
+    queryset = models.mlbb_Membership.objects.all()
+    serializer_class = serializers.Mlbb_MembershipSerializer
+
+class mlbbCommunityView(generics.ListAPIView):
+    serializer_class = serializers.Mlbb_CommunitySerializer
+
+    def get_queryset(self):
+        try:
+            return models.mlbb_community.objects.all()
+        except ObjectDoesNotExist:
+            return Response({"error": "mlbb_squad not found"}, status=status.HTTP_404_NOT_FOUND)
+
 

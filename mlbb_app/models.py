@@ -65,10 +65,11 @@ class mlbb_community(models.Model):
     community_tag = models.CharField(max_length=255, null=False, unique=True)
     community_name = models.CharField(max_length=50)
     community_description = models.TextField()
-    community_image = models.ImageField(upload_to='images/')
-    leader = models.ForeignKey('mlbb_app.mlbb_profile', on_delete=models.CASCADE, related_name='squad_leader')
-    applicants = models.ManyToManyField()
-    squads = models.ManyToManyField(mlbb_squad, through="Membership")
+    community_image = models.ImageField(upload_to='images/', blank=True, null=True)
+    community_country = models.CharField(max_length=50)
+    leader = models.ForeignKey(mlbb_profile, on_delete=models.CASCADE, related_name='community_leader')
+    applicants = models.ManyToManyField(mlbb_squad,  related_name='applicant_communities')
+    squads = models.ManyToManyField(mlbb_squad, through="mlbb_Membership")
 
 
 class mlbb_Membership(models.Model):
