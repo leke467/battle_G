@@ -71,9 +71,18 @@ class mlbb_community(models.Model):
     applicants = models.ManyToManyField(mlbb_squad,  related_name='applicant_communities')
     squads = models.ManyToManyField(mlbb_squad, through="mlbb_Membership")
 
+    class Meta:
+        db_table = 'mlbb_community'
 
 class mlbb_Membership(models.Model):
     squad = models.ForeignKey(mlbb_squad, on_delete=models.CASCADE)
     community = models.ForeignKey(mlbb_community, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
 
+class mlbb_community_Application(models.Model):
+    user = models.ForeignKey(mlbb_squad, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, default='pending')
+    mlbb_community = models.ForeignKey(mlbb_community, null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'community_applications'
