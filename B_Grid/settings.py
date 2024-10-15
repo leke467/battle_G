@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'player_Account',
     'mlbb_app',
+    'Tournament',
     'rest_framework',
     'rest_framework.authtoken'
 
@@ -91,7 +92,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'HOST': 'LEKE',  # Update host to match instance name
         'PORT': '1433',
-        'NAME': 'new_data',
+        'NAME': 'battle_grid',
         'USER': 'sa',  # Update user format
         'PASSWORD': 'mujeeb467',
         'OPTIONS': {

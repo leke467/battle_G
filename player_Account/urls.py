@@ -4,7 +4,7 @@ from .import views
 
 urlpatterns = [
 
-    path('Account/', views.AccountListCreate.as_view(), name='Account_List_Create'),
-    path('Account/<int:pk>/', views.AccountRetrieveUpdateDestroy.as_view(), name='update'),
-    path('login/', views.LoginView.as_view()),
+    path('Account/', views.Account_list_create.as_view(), name='Account_List_Create'),
+    path('Account/<int:pk>/', views.Account_retrieve_update_destroy.as_view(), name='update'),
+    path('login/', views.Login_view.as_view()),
  ]

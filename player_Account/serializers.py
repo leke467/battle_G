@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import Account
 from django.db import IntegrityError
-class AccountSerializer(serializers.ModelSerializer):
+class Account_serializer(serializers.ModelSerializer):
     # password = serializers.CharField(write_only=True, required=True)
 
     class Meta:

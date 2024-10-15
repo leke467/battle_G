@@ -4,17 +4,17 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from django.db import IntegrityError, transaction
 from player_Account.models import Account
-from player_Account.serializers import AccountSerializer
+from player_Account.serializers import Account_serializer
 from player_Account.backends import Account_Auth_Backend
 import logging
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.authtoken.models import Token
 
 
-class AccountListCreate(generics.ListCreateAPIView):
+class Account_list_create(generics.ListCreateAPIView):
     authentication_classes = [Account_Auth_Backend]
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
+    serializer_class = Account_serializer
 
     def create(self, request, *args, **kwargs):
         email = request.data.get('email')
@@ -44,10 +44,10 @@ class AccountListCreate(generics.ListCreateAPIView):
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class AccountRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+class Account_retrieve_update_destroy(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [Account_Auth_Backend]
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
+    serializer_class = Account_serializer
     lookup_field = 'pk'
 
     def delete(self, request, *args, **kwargs):
@@ -67,7 +67,7 @@ logger = logging.getLogger(__name__)
 
 
 
-class LoginView(APIView):
+class Login_view(APIView):
     account_auth_backend = Account_Auth_Backend()  # Only one instance
 
     def post(self, request):
@@ -92,7 +92,7 @@ class LoginView(APIView):
                 token.delete()
                 token = Token.objects.create(user=account)
 
-            serializer = AccountSerializer(account)
+            serializer = Account_serializer(account)
             data = serializer.data
             return Response({'message': 'Login successful', 'user': data, 'token': token.key},
                             status=status.HTTP_200_OK)

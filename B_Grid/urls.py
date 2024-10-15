@@ -21,6 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('player_Account.urls')),
     path('', include('mlbb_app.urls')),
-    # path('', include('cod_app.urls')),
+    path('', include('Tournament.urls')),
 
 ]
